@@ -5,8 +5,16 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
 
+interface Errors {
+    companyName?: boolean;
+    coreValues?: boolean;
+    sampleText1?: boolean;
+    sampleText2?: boolean;
+    sampleText3?: boolean;
+}
+
 export default function Page() {
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Errors>({});
 
     const handleSubmit = (e: any) => {
         e.preventDefault();

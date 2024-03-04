@@ -5,31 +5,30 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
 
+interface Errors {
+    styleGuide?: boolean;
+    textToStyle?: boolean;
+}
+
 export default function Page() {
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Errors>({});
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
-        const companyName = formData.get('companyName');
-        const coreValues = formData.get('coreValues');
         const styleGuide = formData.get('styleGuide');
         const textToStyle = formData.get('textToStyle');
-        const sampleText3 = formData.get('sampleText3');
 
-        if (!companyName || !coreValues || !styleGuide || !textToStyle || !sampleText3) {
+        if (!styleGuide || !textToStyle) {
             setErrors({
-                companyName: !companyName,
-                coreValues: !coreValues,
                 styleGuide: !styleGuide,
                 textToStyle: !textToStyle,
-                sampleText3: !sampleText3,
             });
             return;
         }
 
         // Submit the form data and generate the style guide
-        console.log('Form submitted:', { companyName, coreValues, styleGuide, textToStyle, sampleText3 });
+        console.log('Form submitted:', { styleGuide, textToStyle });
     };
 
     return (
