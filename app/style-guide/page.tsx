@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
+import { useRouter } from 'next/navigation'
 
 interface Errors {
     companyName?: boolean;
@@ -15,6 +16,7 @@ interface Errors {
 
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
+    const router = useRouter()
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -54,7 +56,7 @@ export default function Page() {
 
                 <div className="mb-4">
                     <Label htmlFor="coreValues" className="block">Core Values</Label>
-                    <Textarea id="coreValues" name="coreValues" className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                    <Textarea id="coreValues" name="coreValues" placeholder='Your company values e.g. Your global partner in reimagining healthcare' value='Your global partner in reimagining healthcare' className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.coreValues && <p className="text-red-500">Core Values are required</p>}
                 </div>
 
@@ -75,7 +77,8 @@ export default function Page() {
                     <Textarea id="sampleText3" name="sampleText3" className={`border ${errors.sampleText3 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.sampleText3 && <p className="text-red-500">Sample Text 3 is required</p>}
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center space-x-2">
+                    <Button type="button" className="font-bold py-2 px-4 rounded">Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded">Generate Style Guide</Button>
                 </div>
             </form>

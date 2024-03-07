@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
+import { useRouter } from 'next/navigation'
+
 
 interface Errors {
     styleGuide?: boolean;
@@ -12,6 +14,7 @@ interface Errors {
 
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
+    const router = useRouter()
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -48,7 +51,8 @@ export default function Page() {
                     <Textarea id="textToStyle" name="textToStyle" className={`border ${errors.textToStyle ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.textToStyle && <p className="text-red-500">Sample Text 2 is required</p>}
                 </div>
-                <div className="flex justify-center">
+                <div className="flex justify-center space-x-2" onClick={() => router.back()}>
+                    <Button type="button" className="font-bold py-2 px-4 rounded">Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded">Generate Styled Text</Button>
                 </div>
             </form>
