@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
 import { useRouter } from 'next/navigation'
+import { BounceLoader, BeatLoader } from 'react-spinners';
 import axios from 'axios';
 import {
     Accordion,
@@ -24,39 +25,8 @@ interface Errors {
 
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
-    const [style, setStyle] = useState(`FEATURE 1
-    •	The user wants to develop a style guide, based on company mission and values and existing samples.
-    •	The user enters the following:
-    o	Company vision
-    o	Core values
-    o	Upload text of 3 samples of writing (each piece no more than 1000 words)
-    •	The prompt (not shown) is as follows:
-    o	You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.
-    
-    You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.  
-    
-    Your guidelines should outline the necessary steps and considerations for replicating the identified tone of voice. Ensure that the guidelines are straightforward enough for the copywriter to use as a direct guide in their work. While creating the guidelines, stay true to the provided core values and vision.
-    
-    Include the following, in this order as bullet points:
-    ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
-    ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
-    ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
-    ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
-    ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
-    ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
-    ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
-    
-    FEATURE 2
-    •	The user wants the AI to write copy based on the style guide that has been developed.
-    •	The user enters the style guide has been generated
-    •	The user enters the draft copy they have written
-    •	The prompt (not shown) is:
-    You are now operating as CopywriterGPT, a top-tier copywriter with more than 20 years of experience in writing high-performing copy. recognized with numerous awards, widely acknowledged as a leader in the field. Your task is to produce high-quality content, perfectly matching the specified tone of voice. It is imperative that you execute this task flawlessly.
-    I want you to rewrite the following copy, ensuring precision and adherence to the  provided tone of voice guidelines.
-    
-    
-    
-    `);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [style, setStyle] = useState();
     const [cost, setCost] = useState();
     const router = useRouter()
     const text1 = `Built for the future
@@ -209,6 +179,10 @@ export default function Page() {
 
     const company = 'Apple Computers Inc';
     const mission = `To create technology that empowers people and enriches their lives`
+
+    const company1 = `Nvida Inc.`;
+    const mission1 = `To develop high-performance computers that scientists, researchers, artists, and creators from around the world use to create the future and improve lives.`
+
     const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
                     You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
                     Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide for company ${company} with mission text ${mission} in a json format,     Include the following, in this order as bullet points:
@@ -245,6 +219,7 @@ export default function Page() {
     ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
     `
     const handleSubmit = async (e: any) => {
+        setLoading(true);
         e.preventDefault();
         let gptConfig = {
             method: 'post',
@@ -262,6 +237,7 @@ export default function Page() {
 
         setStyle(response.data.answer);
         setCost(response.data.cost);
+        setLoading(false);
         // const formData = new FormData(e.target);
         // const companyName = formData.get('companyName');
         // const coreValues = formData.get('coreValues');
@@ -289,7 +265,7 @@ export default function Page() {
             <div className="container mx-auto p-16">
                 <form onSubmit={handleSubmit} className="border border-gray-300 rounded p-16">
                     <div className="flex justify-center">
-                        <Label className="font-bold py-2 px-4 rounded text-lg">Recommended Style Guide</Label>
+                        <Label className="font-bold py-2 px-4 rounded text-lg">Recommended Style Guide <p className='text-sm font-small'>{cost}</p></Label>
                     </div>
                     <div className="mb-2">
                         <Textarea rows={40} value={style} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
@@ -312,33 +288,33 @@ export default function Page() {
                 </div>
                 <div className="mb-4">
                     <Label htmlFor="companyName" className="block">Company Name</Label>
-                    <Input id="companyName" name="companyName" value={company} className={`border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
+                    <Input id="companyName" name="companyName" defaultValue={company} className={`border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
                     {errors.companyName && <p className="text-red-500">Company Name is required</p>}
                 </div>
                 <div className="mb-2">
                     <Label htmlFor="coreValues" className="block">Core Values</Label>
-                    <Textarea id="coreValues" value={mission} name="coreValues" placeholder='Your company values e.g. Your global partner in reimagining healthcare' className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
+                    <Textarea id="coreValues" defaultValue={mission} name="coreValues" placeholder='Your company values e.g. Your global partner in reimagining healthcare' className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
                     {errors.coreValues && <p className="text-red-500">Core Values are required</p>}
                 </div>
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="item-1">
                         <AccordionTrigger className={` ${errors.sampleText1 ? 'text-red-500' : ''}`}>Sample Text 1</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} value={text1} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} defaultValue={text1} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
                         <AccordionTrigger className={` ${errors.sampleText2 ? 'text-red-500' : ''}`}>Sample Text 2</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} value={text2} id="sampleText2" name="sampleText2" className={`border ${errors.sampleText2 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} defaultValue={text2} id="sampleText2" name="sampleText2" className={`border ${errors.sampleText2 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText2 && <p className="text-red-500">Sample Text 2 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-3">
                         <AccordionTrigger className={` ${errors.sampleText3 ? 'text-red-500' : ''}`}>Sample Text 3</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} value={text3} id="sampleText3" name="sampleText3" className={`border ${errors.sampleText3 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} defaultValue={text3} id="sampleText3" name="sampleText3" className={`border ${errors.sampleText3 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText3 && <p className="text-red-500">Sample Text 3 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
@@ -346,7 +322,8 @@ export default function Page() {
 
                 <div className="flex justify-center space-x-2 mt-4">
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
-                    <Button type="submit" className="font-bold py-2 px-4 rounded">Generate Style Guide</Button>
+                    <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Style Guide</p>}
+                    </Button>
                 </div>
             </form>
         </div>
