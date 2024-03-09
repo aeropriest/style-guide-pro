@@ -16,6 +16,9 @@ export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
     const router = useRouter()
 
+    const prompt = `You are now operating as CopywriterGPT, a top-tier copywriter with more than 20 years of experience in writing high-performing copy. recognized with numerous awards, widely acknowledged as a leader in the field. Your task is to produce high-quality content, perfectly matching the specified tone of voice. It is imperative that you execute this task flawlessly.
+    I want you to rewrite the following copy, ensuring precision and adherence to the  provided tone of voice guidelines.`
+
     const handleSubmit = (e: any) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -51,8 +54,8 @@ export default function Page() {
                     <Textarea id="textToStyle" name="textToStyle" className={`border ${errors.textToStyle ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.textToStyle && <p className="text-red-500">Sample Text 2 is required</p>}
                 </div>
-                <div className="flex justify-center space-x-2" onClick={() => router.back()}>
-                    <Button type="button" className="font-bold py-2 px-4 rounded">Back</Button>
+                <div className="flex justify-center space-x-2" >
+                    <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded">Generate Styled Text</Button>
                 </div>
             </form>
