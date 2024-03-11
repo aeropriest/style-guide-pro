@@ -272,7 +272,7 @@ export default function Page() {
                         {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
                     </div>
                     <div className="flex justify-center space-x-2 mt-4">
-                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setStyle(``)}>Back</Button>
+                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => alert('go back')}>Back</Button>
                         <Button type="submit" className="font-bold py-2 px-4 rounded">Save</Button>
                     </div>
                 </form>
