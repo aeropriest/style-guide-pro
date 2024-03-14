@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -26,7 +26,7 @@ interface Errors {
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
     const [loading, setLoading] = useState<boolean>(false);
-    const [style, setStyle] = useState();
+    const [style, setStyle] = useState<string|undefined>();
     const [cost, setCost] = useState();
     const router = useRouter()
     const text1 = `Built for the future
@@ -177,23 +177,8 @@ export default function Page() {
     Clients say we’re commercially minded and come up with ideas that work for their businesses.
     `
 
-    const company = 'Apple Computers Inc';
-    const mission = `To create technology that empowers people and enriches their lives`
-
-    const company1 = `Nvida Inc.`;
-    const mission1 = `To develop high-performance computers that scientists, researchers, artists, and creators from around the world use to create the future and improve lives.`
-
-    const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
-                    You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
-                    Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide for company ${company} with mission text ${mission} in a json format,     Include the following, in this order as bullet points:
-                    ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
-                    ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
-                    ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
-                    ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
-                    ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
-                    ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
-                    ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
-                `
+    const company = 'Elite Law Firm';
+    const mission = `Innovative, supportive, collaborative, bold, excpetional`
 
     const text = `${text1}\nn${text2}\nn${text3}\nn`
     const p = `
@@ -218,46 +203,52 @@ export default function Page() {
     ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
     ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
     `
-    const handleSubmit = async (e: any) => {
+
+    const [formData, setFormData] = useState({
+        companyName: company,
+        coreValues: mission,
+        sampleText1: text1,
+        sampleText2: text2,
+        sampleText3: text3
+    });
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         setLoading(true);
         e.preventDefault();
+        console.log('Form values:', formData);
+        const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
+        You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
+        Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide for company ${formData.companyName} with mission text ${formData.coreValues},     Include the following, in this order as bullet points:
+        ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
+        ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
+        ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
+        ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
+        ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
+        ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
+        ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
+    `
         let gptConfig = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: '/api/gpt-edge',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: JSON.stringify({
-                prompt,
-                text,
-            })
+        method: 'post',
+        maxBodyLength: Infinity,
+        url: '/api/gpt-edge',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        data: JSON.stringify({
+            prompt,
+            text,
+        })
         };
         let response = await axios.request(gptConfig);
 
         setStyle(response.data.answer);
         setCost(response.data.cost);
-        setLoading(false);
-        // const formData = new FormData(e.target);
-        // const companyName = formData.get('companyName');
-        // const coreValues = formData.get('coreValues');
-        // const sampleText1 = formData.get('sampleText1');
-        // const sampleText2 = formData.get('sampleText2');
-        // const sampleText3 = formData.get('sampleText3');
-
-        // if (!companyName || !coreValues || !sampleText1 || !sampleText2 || !sampleText3) {
-        //     setErrors({
-        //         companyName: !companyName,
-        //         coreValues: !coreValues,
-        //         sampleText1: !sampleText1,
-        //         sampleText2: !sampleText2,
-        //         sampleText3: !sampleText3,
-        //     });
-        //     return;
-        // }
-
-        // // Submit the form data and generate the style guide
-        // console.log('Form submitted:', { companyName, coreValues, sampleText1, sampleText2, sampleText3 });
+        setLoading(false);        
     };
 
     if (style) {
@@ -272,7 +263,7 @@ export default function Page() {
                         {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
                     </div>
                     <div className="flex justify-center space-x-2 mt-4">
-                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => alert('go back')}>Back</Button>
+                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setStyle('')}>Back</Button>
                         <Button type="submit" className="font-bold py-2 px-4 rounded">Save</Button>
                     </div>
                 </form>
@@ -288,33 +279,33 @@ export default function Page() {
                 </div>
                 <div className="mb-4">
                     <Label htmlFor="companyName" className="block">Company Name</Label>
-                    <Input id="companyName" name="companyName" defaultValue={company} className={`border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
+                    <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleChange} className={`border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.companyName && <p className="text-red-500">Company Name is required</p>}
                 </div>
                 <div className="mb-2">
                     <Label htmlFor="coreValues" className="block">Core Values</Label>
-                    <Textarea id="coreValues" defaultValue={mission} name="coreValues" placeholder='Your company values e.g. Your global partner in reimagining healthcare' className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w - full p - 2`} />
+                    <Textarea id="coreValues" value={formData.coreValues} onChange={handleChange} name="coreValues" placeholder='Your company values e.g. Your global partner in reimagining healthcare' className={`border ${errors.coreValues ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                     {errors.coreValues && <p className="text-red-500">Core Values are required</p>}
                 </div>
                 <Accordion type="single" collapsible className="w-full">
                     <AccordionItem value="item-1">
                         <AccordionTrigger className={` ${errors.sampleText1 ? 'text-red-500' : ''}`}>Sample Text 1</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} defaultValue={text1} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} value={formData.sampleText1} onChange={handleChange} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-2">
                         <AccordionTrigger className={` ${errors.sampleText2 ? 'text-red-500' : ''}`}>Sample Text 2</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} defaultValue={text2} id="sampleText2" name="sampleText2" className={`border ${errors.sampleText2 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} value={formData.sampleText2} onChange={handleChange} id="sampleText2" name="sampleText2" className={`border ${errors.sampleText2 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText2 && <p className="text-red-500">Sample Text 2 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
                     <AccordionItem value="item-3">
                         <AccordionTrigger className={` ${errors.sampleText3 ? 'text-red-500' : ''}`}>Sample Text 3</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} defaultValue={text3} id="sampleText3" name="sampleText3" className={`border ${errors.sampleText3 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                            <Textarea rows={20} value={formData.sampleText3} onChange={handleChange} id="sampleText3" name="sampleText3" className={`border ${errors.sampleText3 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
                             {errors.sampleText3 && <p className="text-red-500">Sample Text 3 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
@@ -322,8 +313,7 @@ export default function Page() {
 
                 <div className="flex justify-center space-x-2 mt-4">
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
-                    <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Style Guide</p>}
-                    </Button>
+                    <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Style Guide</p>}</Button>
                 </div>
             </form>
         </div>
