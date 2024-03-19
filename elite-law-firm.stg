@@ -1,0 +1,52 @@
+{
+    "Introduction": {
+        "What are brand voice & tone guidelines?": "Brand Voice & Tone Guidelines are a set of rules and principles that define the unique personality and style of communication for a brand.",
+        "Purpose": "The purpose is to set a cohesive, distinct and consistent communication style across all customer touch points to create a coherent brand image.",
+        "How it helps?": "It helps to create a strong and unambiguous brand image leading to better brand recall. It also provides a framework for all written communication ensuring syntactic and semantic consistency.", 
+        "Why we are using them?": "We are using these guidelines to ensure a coherent, distinguishable and resonant voice and tone that communicates the brand's mission, values and character."
+    },
+    
+    "Guiding Principles": [
+        {
+            "Principle": "Innovation",
+            "Meaning": "We are constantly looking for novel ideas and solutions.",
+            "Effect on Writing": "Our writing should reflect eagerness for change and a forward-thinking approach.",
+            "Example Best Practice Copy": "Let’s make business better. Together.",
+            "Incorrect Copy": "We are comfortable doing things the traditional way."
+        },
+        {
+            "Principle": "Collaboration",
+            "Meaning": "We value teamwork and believe in achieving results together.",
+            "Effect on Writing": "The copy should emphasize mutual effort and the joy of achieving together.",
+            "Example Best Practice Copy": "Collaboration plays a crucial role in climate action.",
+            "Incorrect Copy": "We believe in individual effort and competition."
+        },
+        {
+            "Principle": "Supportiveness",
+            "Meaning": "We are compassionate, caring, and always ready to extend help.",
+            "Effect on Writing": "Our writing should be grounded in empathy and generosity, focusing on customer needs.",
+            "Example Best Practice Copy": "We ensure our people have the right resources and support they need to perform and deliver at their best for our clients.",
+            "Incorrect Copy": "We provide resources; it is up to the employees to use them effectively."
+        },
+        {
+            "Principle": "Boldness",
+            "Meaning": "We are fearless and confident in our decisions and actions.",
+            "Effect on Writing": "The copy should exude authority, decisiveness and ambition.",
+            "Example Best Practice Copy": "We are fearless and inquisitive, challenging ourselves to think big and find creative new solutions.",
+            "Incorrect Copy": "We prefer to follow established norms and avoid risks."
+        }
+    ],
+    
+    "Vocabulary": "Our vocabulary is intelligent yet easy to understand, professional without being overly technical. We use industry jargon selectively and carefully define terms when appropriate. Our word choice should reflect our guiding principles – innovative, supportive, collaborative, and bold.",
+
+    "Tone": "Our tone is confident, optimistic, and empathetic. We convey trust and competence while maintaining a friendly and approachable demeanor, creating a balance between professionalism and relatability.",
+
+    "Cadence": "The rhythm of our writing is steady and balanced. Short, clear sentences are interwoven with more complex or detailed explanations, mimicking the rhythm of a natural conversation.",
+
+    "Marketing Channels": {
+       "Website": "Formal, informative and detailed. Show authority and experience.", 
+       "Email": "Friendly and professional. Maintain a balance between formality and approachability.", 
+       "Social Media": "Relaxed and conversational. Engage with audience and encourage interaction.", 
+       "Newsletters/Blogs": "Informative and engaging. Provide in-depth content with an engaging tone."
+    }
+}
