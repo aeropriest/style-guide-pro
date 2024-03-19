@@ -2,12 +2,10 @@
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 
-interface StyleGuideProps {
-  data: Record<string, any>;
-}
 
-const StyleGuideParser: React.FC<StyleGuideProps> = ({ data }) => {
-  const [fileContent, setFileContent] = useState('');
+const StyleGuideParser = () => {
+  const [fileContent, setFileContent] = useState<React.ReactNode | undefined>(undefined);
+
   
   function parseJson(json: any): React.ReactNode {
     function traverse(obj: any, depth: number = 0): React.ReactNode {

@@ -223,7 +223,7 @@ export default function Page() {
         console.log('Form values:', formData);
         const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
         You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
-        Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide in JSON format for company ${formData.companyName} with mission text ${formData.coreValues}, Include the following, in this order as bullet points:
+        Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide for company ${formData.companyName} with mission text ${formData.coreValues}, Include the following, in this order as bullet points:
         ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
         ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
         ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
