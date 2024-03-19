@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
 import { useRouter } from 'next/navigation'
 import { BounceLoader, BeatLoader } from 'react-spinners';
+import { saveAs } from 'file-saver';
+
 import axios from 'axios';
 import {
     Accordion,
@@ -23,10 +25,41 @@ interface Errors {
     sampleText3?: boolean;
 }
 
+const hardCodeStyle = `apple-inc.stg
+Introduction:
+What are brand voice & tone guidelines: Brand voice and tone guidelines are critical tools that help ensure consistent communication across all platforms and touchpoints. They guide the language, style, tone, and voice used in all our interactions and drive efficiency, alignment and concise messaging. Simply put, they help us sound like us, everywhere, every time.
+Purpose: These guidelines help to align communication across all platforms, ensure clarity and consistency in our messaging, and foster a strong connection with our target audience.
+How they help: Guidelines ensure that our brand is conveyed authentically and consistently while resonating and engaging with our customers effectively.
+Why we're using them: We use these guidelines to ensure that every message we put out into the world reflects our brand's personality, enhances our customer relationships, and supports our company ethos and vision.
+Voice & Tone Guiding Principles:
+Principle: Authentic&Innovative
+What it means: With a rich history under our belts, our voice should always sound true to who we are, and our tone should express our culture of forward-thinking and innovation.
+How it affects our writing: Our writing should be an honest reflection of our brand and embody our spirit of being pioneers in technology, consistently pushing boundaries.
+Example best practice copy: We're Apple. We're not just a technology company. We're your partners in innovation, dedicated to enriching your lives and empowering your future, every day.
+What not to do in the copy: Avoid jargon, overcomplexity, or overdramatizing our achievements.
+Examples of incorrect copy: Introducing the supreme songbird of technology, ushering in a digital utopia!
+Principle: Inspiring&Supportive
+What it means: We aim to not only create technology but inspire our customers with our commitment to a better, sustainable future, all while supporting and enriching their lives
+How it affects our writing: Our narrative should aim to motivate and guide while remaining supportive and understanding towards our consumers' needs.
+Example best practice copy: At Apple, we're here to make technology a seamless, enriching part of your life, and committed to creating a sustainable future for us all.
+What not to do in the copy: Avoid sounding condescending or unsupportive to customer needs and desires.
+Examples of incorrect copy: Why wouldn't anyone want our newest product? It is obviously the best!
+Vocabulary: Our language must be clear, coherent, and compelling. We communicate simply, avoid jargon, and use powerful, straightforward language that people can connect with. Every word should resonate with our purpose of enriching lives through innovation and sustainability.
+Tone: Our tone is confident, inspiring, and supportive. We speak in an assured and aspirational manner, yet with a deep sense of empathy and understanding for our audience. Our voice soothes, educates, and invigorates, reflecting our innovations and our undying commitment to our customers.
+Cadence: Our rhythm is smooth, deliberate, and dynamic. We structure our sentences to flow naturally and harness the power of rhythm to captivate our audience. Our writing style is crisp, concise and fluid, reflecting Apple's simplistic yet powerful persona.
+Marketing channels:
+Website and Blogs: Maintain an inspiring and supportive tone with a clear and vivid language
+Social Media: Lean towards a more conversational and engaging tone. Include calls to action when appropriate.
+Email Marketing: Focus on direct language that is both informative and supportive
+Offline Channels: Retain a confident and inspiring tone. Use clear and concise descriptions.
+`
+
+import jsonData from '@/public/elite-law-firm.json'
+
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
     const [loading, setLoading] = useState<boolean>(false);
-    const [style, setStyle] = useState<string|undefined>();
+    const [style, setStyle] = useState<string|undefined>(hardCodeStyle);
     const [cost, setCost] = useState();
     const router = useRouter()
     const text1 = `Built for the future
@@ -203,6 +236,42 @@ export default function Page() {
     ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
     ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
     `
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        setLoading(true);
+        e.preventDefault();
+    //     console.log('Form values:', formData);
+    //     const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
+    //     You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
+    //     Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide in JSON format for company ${formData.companyName} with mission text ${formData.coreValues}, Include the following, in this order as bullet points:
+    //     ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
+    //     ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
+    //     ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
+    //     ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
+    //     ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
+    //     ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
+    //     ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
+    // `
+    //     let gptConfig = {
+    //     method: 'post',
+    //     maxBodyLength: Infinity,
+    //     url: '/api/gpt-edge',
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     data: JSON.stringify({
+    //         prompt,
+    //         text,
+    //     })
+    //     };
+    //     let response = await axios.request(gptConfig);
+
+    //     setStyle(response.data.answer);
+    //     setCost(response.data.cost);
+
+        const parsedText = parseJson(jsonData);
+        setFileContent(parsedText);
+        setLoading(false);        
+    };
 
     const [formData, setFormData] = useState({
         companyName: company,
@@ -217,40 +286,81 @@ export default function Page() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        setLoading(true);
-        e.preventDefault();
-        console.log('Form values:', formData);
-        const prompt = `You are a leading copywriter with more than 20 years of experience in writing high-performing copy, and with expertise in linguistics, natural processing, decision making, persuasion, psychology, behavioral economics, marketing, sales, UX design, customer experience, branding, and conversion rate optimization. Pretend that you are also highly empathetic and understand how people think and what makes them tick.\n    
-        You're an expert on human emotions, behavior, and language. You can easily and expertly detect personality, thoughts, subtle style and voice details, including mimicking any voice, tone, style, jargon and sentiment of any text. Based on provided texts, generate detailed brand voice and tone guidelines.\n
-        Your job is use below 3 samples of writing that includes company mission, values and sample tone and create a style guide in JSON format for company ${formData.companyName} with mission text ${formData.coreValues}, Include the following, in this order as bullet points:
-        ⎼	Introduction: What are brand voice & tone guidelines, what’s their purpose, how they help and why we’re using them.
-        ⎼	3 or 4 Voice & Tone Guiding principles that help bring the brand to life
-        ⎼	For each of the guiding principles list: What it means, How it affects our writing, Example best practice copy, What not to do in the copy, and Examples of incorrect copy.
-        ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
-        ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
-        ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
-        ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
-    `
-        let gptConfig = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: '/api/gpt-edge',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-            prompt,
-            text,
-        })
-        };
-        let response = await axios.request(gptConfig);
 
-        setStyle(response.data.answer);
-        setCost(response.data.cost);
-        setLoading(false);        
+
+    const [fileContent, setFileContent] = useState< React.ReactNode | undefined>('');
+  
+    function parseJson(json: any): React.ReactNode {
+      function traverse(obj: any, depth: number = 0): React.ReactNode {
+        if (Array.isArray(obj)) {
+          return obj.map((item, index) => (
+            <div key={index}>
+              {traverse(item, depth)}
+            </div>
+          ));
+        } else if (typeof obj === 'object' && obj !== null) {
+          return (
+            <div key={depth} className='py-4 text-lg'>
+              {Object.keys(obj).map((key) => (
+                <div key={key}>
+                  <b>{key}</b>: {traverse(obj[key], depth + 1)}
+                </div>
+              ))}
+            </div>
+          );
+        } else {
+          return obj;
+        }
+      }
+      return traverse(json);
+    }
+  
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          console.log('file loaded')
+          if (e.target?.result) {
+            setStyle((prev)=>JSON.parse(e.target.result as string))            
+            const parsedText = parseJson(style);
+            setFileContent(parsedText);
+            }
+        };
+        reader.readAsText(file);
+      }
     };
 
+    const saveFile = (fileContent: string, fileName: string, fileExtension: string) => {
+        const styleObject = JSON.parse(style);
+        const blob = new Blob([JSON.stringify(styleObject, null, 2)], { type: 'application/json' });
+        saveAs(blob, `${fileName}.${fileExtension}`);
+    };
+
+    const handleSaveClick = () => {
+        saveFile(JSON.stringify(fileContent), 'style-guide', 'stg');
+      };
+    
+
+    if( fileContent){
+        return (<div className="container mx-auto p-16">
+        <form onSubmit={handleSubmit} className="border border-gray-300 rounded px-16 py-4">
+            <div className="flex justify-center">
+                <Label className="font-bold py-2 px-4 rounded text-2xl">Recommended Style Guide <p className='text-sm font-small'>{cost}</p></Label>
+            </div>
+            <div className="mb-2">
+                {fileContent}
+                {/* <Textarea rows={40} value={style} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>} */}
+            </div>
+            <div className="flex justify-center space-x-2 mt-4">
+                <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setFileContent('')}>Back</Button>
+                <Button type="submit" className="font-bold py-2 px-4 rounded" onClick={handleSaveClick}>Save</Button>
+            </div>
+        </form>
+    </div>)
+    }
+    
     if (style) {                       
         return (
             <div className="container mx-auto p-16">
@@ -314,6 +424,23 @@ export default function Page() {
                 <div className="flex justify-center space-x-2 mt-4">
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Style Guide</p>}</Button>
+                    <div className="flex justify-center space-x-2" >
+                    <input
+                    type="file"
+                    accept=".stg"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="styleGuideFile"
+                    name="styleGuideFile"
+                />
+                <Button
+                    type="button"
+                    className="font-bold py-2 px-4 rounded"
+                    onClick={() => document.getElementById('styleGuideFile')?.click()}
+                >
+                    Load Style Guide
+                </Button>
+                </div>                    
                 </div>
             </form>
         </div>

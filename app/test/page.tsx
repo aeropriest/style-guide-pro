@@ -2,13 +2,10 @@
 import React, { useState } from 'react';
 import { Textarea } from '@/components/ui/textarea';
 
-interface StyleGuideProps {
-  data: Record<string, any>;
-}
+const StyleGuideParser: React.FC = () => {
+  const [htmlContent, setHtmlContent] = useState<React.ReactNode>('');
+  const [jsonContent, setJsonContent] = useState<any>('');
 
-const StyleGuideParser: React.FC<StyleGuideProps> = ({ data }) => {
-  const [fileContent, setFileContent] = useState('');
-  
   function parseJson(json: any): React.ReactNode {
     function traverse(obj: any, depth: number = 0): React.ReactNode {
       if (Array.isArray(obj)) {
@@ -39,17 +36,33 @@ const StyleGuideParser: React.FC<StyleGuideProps> = ({ data }) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        console.log('file loaded')
+        console.log('file loaded');
         if (e.target?.result) {
-          const jsonData = JSON.parse(e.target.result as string); // Parse JSON string into an object
-          const parsedText = parseJson(jsonData); // Call parseJson with the object
-          setFileContent(parsedText);
-          }
+          const jsonData = JSON.parse(e.target.result as string);
+          setJsonContent(jsonData);
+          const parsedText = parseJson(jsonData);
+          setHtmlContent(parsedText);
+        }
       };
       reader.readAsText(file);
     }
   };
-  
+
+  const handleSave = () => {
+    if (jsonContent) {
+      const json = JSON.stringify(jsonContent, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'styleguide.stg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  };
+
   return (
     <div>
       <input
@@ -58,12 +71,12 @@ const StyleGuideParser: React.FC<StyleGuideProps> = ({ data }) => {
         onChange={handleFileChange}
         className="mt-4"
       />
-
-      
-      <div className='p-4'>{fileContent}</div>
-      {/* <Textarea rows={50} value={fileContent} readOnly className="border border-gray-300 rounded w-full p-2" /> */}
-
-      {/* {renderContent(data)} */}
+      <div className='p-4'>{htmlContent}</div>
+      {htmlContent && (
+        <button onClick={handleSave} className="btn mt-4">
+          Save Style Guide
+        </button>
+      )}
     </div>
   );
 };
