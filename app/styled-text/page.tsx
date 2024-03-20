@@ -5,7 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@radix-ui/react-label';
 import { useRouter } from 'next/navigation'
+import { BounceLoader, BeatLoader } from 'react-spinners';
 
+import axios from 'axios';
 import {
     Accordion,
     AccordionContent,
@@ -13,21 +15,22 @@ import {
     AccordionTrigger,
 } from "@/components/ui/accordion"
 
-
 interface Errors {
     styleGuide?: boolean;
     textToStyle?: boolean;
 }
 
-
 export default function Page() {
-
-
     const [errors, setErrors] = useState<Errors>({});
-    const router = useRouter()
+    const [loading, setLoading] = useState<boolean>(false);
+    const [formData, setFormData] = useState({
+        styleGuide: '',
+        textToStyle: '',
+    });
+    const [htmlContent, setHtmlContent] = useState<React.ReactNode | undefined>('');
+    const [jsonContent, setJsonContent] = useState<any>({});
 
-    const prompt = `You are now operating as CopywriterGPT, a top-tier copywriter with more than 20 years of experience in writing high-performing copy. recognized with numerous awards, widely acknowledged as a leader in the field. Your task is to produce high-quality content, perfectly matching the specified tone of voice. It is imperative that you execute this task flawlessly.
-    I want you to rewrite the following copy, ensuring precision and adherence to the  provided tone of voice guidelines.`
+    const router = useRouter();
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
@@ -42,72 +45,72 @@ export default function Page() {
             });
             return;
         }
-
-        // Submit the form data and generate the style guide
         console.log('Form submitted:', { styleGuide, textToStyle });
     };
 
-    const [formData, setFormData] = useState({
-        textToStyle: '',
-        styleGuide: '',
-    });
 
     const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    function generateGuidelinesText(data: any) {
-        let text = "";
-    
-        // Introduction
-        text += `Introduction: Brand Voice & Tone Guidelines\n\n`;
-        text += `Brand voice and tone guidelines provide a blueprint for how Elite Law Firm communicates through its written contents. These guidelines lay out the values, personality, and sentiments we wish to convey, ensuring we engage our audience in a consistent, relatable, and trustworthy manner. They help to establish a unique brand identity, enhance our customer relationships, and ensure all our messages align with our branding irrespective of channel or writer.\n\n`;
-    
-        // Guiding Principles
-        text += `Voice & Tone Guiding Principles:\n`;
-        console.log(data["Guiding Principles"]);
-        // data["Guiding Principles"].forEach((principle: any, index: any) => {
-        //     text += `${index + 1}. ${principle.Principle}:\n`;
-        //     text += `    - Meaning: ${principle.Meaning}\n`;
-        //     text += `    - Effect on writing: ${principle["Effect on Writing"]}\n`;
-        //     text += `    - Best practice example: "${principle["Example Best Practice Copy"]}"\n`;
-        //     text += `    - Not to do: ${principle["Incorrect Copy"]}\n\n`;
-        // });
-    
-        // // Vocabulary, Tone, Cadence
-        // text += `Vocabulary:\n${data["Vocabulary"]}\n\n`;
-        // text += `Tone:\n${data["Tone"]}\n\n`;
-        // text += `Cadence:\n${data["Cadence"]}\n\n`;
-    
-        // // Marketing Channels
-        // text += `Marketing Channels:\n`;
-        // Object.entries(data["Marketing Channels"]).forEach(([channel, description]) => {
-        //     text += `- ${channel}: ${description}\n`;
-        // });
-    
-        return text;
-    }
-
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    const fileContent = e.target?.result as string;
-                    console.log('----- file content -----', fileContent);
-                    // const parsedData = JSON.parse(fileContent);
-                    const parsedData = generateGuidelinesText(fileContent);
-                    console.log('---- parsed content ------', parsedData)
-                    setFormData({ ...formData, styleGuide: parsedData});
-                } catch (error) {
-                    console.error('Error parsing file:', error);
+                if (e.target?.result) {
+                    const json = JSON.parse(e.target.result as string);
+                    setJsonContent(json);
+                    const parsedJson = parseJson(json);
+                    setHtmlContent(parsedJson);
                 }
             };
             reader.readAsText(file);
         }
     };
+
+    
+    const handleFileChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {        
+        const file = e.target.files?.[0];
+        if (file) {            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                if (e.target?.result) {
+                    setJsonContent(JSON.parse(e.target.result as string));
+                    const parsedJson = parseJson(jsonContent);
+                    console.log(parsedJson);
+                    setHtmlContent(parsedJson);
+                }
+            };
+            reader.readAsText(file);
+        }
+    };
+    function parseJson(json: any): React.ReactNode {
+        function traverse(obj: any, depth: number = 0): React.ReactNode {
+            if (Array.isArray(obj)) {
+                return obj.map((item, index) => (
+                    <div key={index}>
+                        {traverse(item, depth)}
+                    </div>
+                ));
+            } else if (typeof obj === 'object' && obj !== null) {
+                return (
+                    <div key={depth} className='py-4 text-lg'>
+                        {Object.keys(obj).map((key) => (
+                            <div key={key}>
+                                <b>{key}</b>: {traverse(obj[key], depth + 1)}
+                            </div>
+                        ))}
+                    </div>
+                );
+            } else {
+                return obj;
+            }
+        }
+        return traverse(json);
+    }
+    
     return (
         <div className="container mx-auto p-16">
             <form onSubmit={handleSubmit} className="border border-gray-300 rounded p-16">
@@ -122,18 +125,17 @@ export default function Page() {
                     <AccordionItem value="item-2">
                         <AccordionTrigger className={` ${errors.styleGuide ? 'text-red-500' : ''}`}>Style Guide</AccordionTrigger>
                         <AccordionContent>
-                            <Textarea rows={20} value={formData.styleGuide} onChange={handleChange} id="styleGuide" name="styleGuide" className={`border ${errors.styleGuide ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
-                            {errors.styleGuide && <p className="text-red-500">Sample Text 2 is required</p>}
+                            {htmlContent}
                         </AccordionContent>
                     </AccordionItem>
                 </Accordion>                
-                <div className="flex justify-center space-x-2" >
+                <div className="flex justify-center space-x-2 mt-8" >
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded">Generate Styled Text</Button>
                     <input
                     type="file"
                     accept=".stg"
-                    onChange={handleFileUpload}
+                    onChange={handleFileChange}
                     className="hidden"
                     id="styleGuideFile"
                     name="styleGuideFile"
@@ -145,8 +147,9 @@ export default function Page() {
                 >
                     Load Style Guide from File
                 </Button>
-                </div>
+                </div>                
             </form>
         </div>
     );
+
 }

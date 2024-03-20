@@ -7,7 +7,6 @@ export default function Home() {
   const router = useRouter();
 
   const handleGenerateStyleGuide = () => {
-    // Navigate to the style-guide page
     router.push("/style-guide");
   };
 
