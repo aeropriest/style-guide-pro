@@ -217,7 +217,7 @@ export default function Page() {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    const generateStyleGuide = async (e: FormEvent<HTMLFormElement>) => {
         setLoading(true);
         e.preventDefault();
         console.log('Form values:', formData);
@@ -246,34 +246,91 @@ export default function Page() {
         };
         let response = await axios.request(gptConfig);
 
-        setStyle(response.data.answer);
+        setStyle(response.data.answer.replace(/\*\*/g, ''));
         setCost(response.data.cost);
+        // setStyle(`Elite Law Firm Brand Voice & Tone Guidelines
+
+        // Introduction:
+        // Brand Voice & Tone Guidelines are essential tools that outline the unique style, voice, and tone a company uses in its communications. These guidelines inform and guide all content, fostering consistent messaging that accurately represents the company's brand identity. For Elite Law Firm, our guidelines will help us maintain a uniform tone that represents our innovative, supportive, collaborative, bold, and exceptional mission. By adhering to these guidelines, our writing will always resonate with clarity, authority, and empathy, distinctively mirroring our company's core values.
+        
+        // Voice & Tone Guiding Principles:
+        
+        // 1. Bold & Innovative: We are fearless, visionary, and creative in our dealings 
+        // 2. Collaborative & Supportive: We value inclusion, empathy, and team spirit 
+        // 3. Strategic & Exceptional: We are driven, focusing on exceeding standards and expectations 
+        
+        // 1. Bold & Innovative
+        //     - What it means: Our copy suggests daring, challenging norms, and embracing fresh ideas. 
+        //     - How it affects our writing: We use confident, energetic, and optimistic language.
+        //     - Best Practice Copy: "Together, we can redefine the legal landscape. Comfort zones? We don't know them! New challenges are our terrain."
+        //     - What not to do: Avoid passive language. Don't be afraid to voice our innovative ideas. 
+        //     - Incorrect Example: "We might possibly venture into unknown territories. If all goes well, we hope our ideas could work." 
+        
+        // 2. Collaborative & Supportive
+        //    - What it means: Valuing trust, mutual respect, diversity, and open dialogue.
+        //    - How it affects our writing: The language used is inclusive, understanding, caring, and respects diversity. 
+        //    - Best Practice Copy: "Every voice matters here. United, we are a powerhouse of brightness, brilliance, and boundless innovation."
+        //    - What not to do: Avoid words that marginalize or exclude. Never belittle or disrespect others in writing. 
+        //    - Incorrect Example: "The most important voices are those at the top. We'll tell you everything you need to know."
+        
+        // 3. Strategic & Exceptional
+        //     - What it means: Committed to delivering unprecedented outcomes through smart decisions.
+        //     - How it affects our writing: Use focused, goal-oriented, and ambitious language. 
+        //     - Best Practice Copy: "With meticulous strategies, we aim for novel breakthroughs - no goal is too grand for our reach."
+        //     - What not to do: Avoid vague or unclear statements. Don't undermine our capabilities or devalue our goals.
+        //     - Incorrect Example: "We'll try our best to meet expectations, but legal strategies can sometimes be confusing."
+        
+        // Vocabulary: Use precise and sophisticated language characterized by legal jargon, active verbs, inclusive words, positive affirmations, and inspirational undertones.
+        
+        // Tone: Adopt an energetic and authoritative tone that encourages innovation and collaboration. Maintain optimism and confidence, articulate core values with enthusiasm, and use powerful, striking language.
+        
+        // Cadence: The rhythm of our writing is energetic and decisive. It maintains a steady tempo, punctuates confidence, and intersperses thought-provoking pauses to highlight our commitment to innovation and collaboration.
+        
+        // Marketing channels: 
+        // 1. Website & Social Media: Use friendly, engaging language, share thought leadership, and innovation stories. 
+        // 2. Email Promotions: Professional and detailed, highlighting our offerings, expertise, and key wins.
+        // 3. Print Brochures: Comprehensive and authoritative, deep-diving into our services and accomplishments. 
+        // 4. Press Releases & Legal Reports: Formal and informative, conveying key messages and findings with absolute clarity.
+        
+        // Let these guidelines serve as a compass, pointing the way to a consistently compelling communication that resonates with our core values and mission.`)
         setLoading(false);        
     };
 
+    const handleSaveStyleGuide = () => {
+        if (style) {
+            const blob = new Blob([style], { type: 'application/txt' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'styleguide.stg';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    };
     if (style) {                       
         return (
-            <div className="container mx-auto p-16">
-                <form onSubmit={handleSubmit} className="border border-gray-300 rounded p-16">
-                    <div className="flex justify-center">
-                        <Label className="font-bold py-2 px-4 rounded text-lg">Recommended Style Guide <p className='text-sm font-small'>{cost}</p></Label>
-                    </div>
-                    <div className="mb-2">
-                        <Textarea rows={40} value={style} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
-                        {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
-                    </div>
-                    <div className="flex justify-center space-x-2 mt-4">
-                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setStyle('')}>Back</Button>
-                        <Button type="submit" className="font-bold py-2 px-4 rounded">Save</Button>
-                    </div>
-                </form>
+            <div className="container mx-auto p-16">                
+                <div className="flex justify-center">
+                    <Label className="font-bold py-2 px-4 rounded text-lg">Recommended Style Guide <p className='text-sm font-small'>{cost}</p></Label>
+                </div>
+                <div className="mb-2">
+                    <Textarea rows={40} value={style} id="sampleText1" name="sampleText1" className={`border ${errors.sampleText1 ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
+                    {errors.sampleText1 && <p className="text-red-500">Sample Text 1 is required</p>}
+                </div>
+                <div className="flex justify-center space-x-2 mt-4">
+                    <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setStyle('')}>Back</Button>
+                    <Button type="submit" className="font-bold py-2 px-4 rounded" onClick={handleSaveStyleGuide}>Save</Button>
+                    <Button onClick={()=>router.push("/styled-text")}>Generate Styled Text</Button>
+                </div>                
             </div>
         )
     }
 
     return (
         <div className="container mx-auto p-16">
-            <form onSubmit={handleSubmit} className="border border-gray-300 rounded p-16">
+            <form onSubmit={generateStyleGuide} className="border border-gray-300 rounded p-16">
                 <div className="flex justify-center">
                     <Label className="font-bold py-2 px-4 rounded text-lg">Generate Style Guide</Label>
                 </div>
