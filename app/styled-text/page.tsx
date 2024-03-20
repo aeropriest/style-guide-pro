@@ -63,29 +63,14 @@ export default function Page() {
                     const json = JSON.parse(e.target.result as string);
                     setJsonContent(json);
                     const parsedJson = parseJson(json);
+                    console.log('parsed json ----', parseJson);
                     setHtmlContent(parsedJson);
                 }
             };
             reader.readAsText(file);
         }
     };
-
     
-    const handleFileChange1 = (e: React.ChangeEvent<HTMLInputElement>) => {        
-        const file = e.target.files?.[0];
-        if (file) {            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                if (e.target?.result) {
-                    setJsonContent(JSON.parse(e.target.result as string));
-                    const parsedJson = parseJson(jsonContent);
-                    console.log(parsedJson);
-                    setHtmlContent(parsedJson);
-                }
-            };
-            reader.readAsText(file);
-        }
-    };
     function parseJson(json: any): React.ReactNode {
         function traverse(obj: any, depth: number = 0): React.ReactNode {
             if (Array.isArray(obj)) {
@@ -122,12 +107,12 @@ export default function Page() {
                             {errors.textToStyle && <p className="text-red-500">Sample Text 1 is required</p>}
                         </AccordionContent>
                     </AccordionItem>
-                    <AccordionItem value="item-2">
+                    {htmlContent && <AccordionItem value="item-2">
                         <AccordionTrigger className={` ${errors.styleGuide ? 'text-red-500' : ''}`}>Style Guide</AccordionTrigger>
                         <AccordionContent>
                             {htmlContent}
                         </AccordionContent>
-                    </AccordionItem>
+                    </AccordionItem>}
                 </Accordion>                
                 <div className="flex justify-center space-x-2 mt-8" >
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
@@ -145,7 +130,7 @@ export default function Page() {
                     className="font-bold py-2 px-4 rounded"
                     onClick={() => document.getElementById('styleGuideFile')?.click()}
                 >
-                    Load Style Guide from File
+                    Load Style Guide
                 </Button>
                 </div>                
             </form>

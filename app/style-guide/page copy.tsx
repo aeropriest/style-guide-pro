@@ -267,8 +267,8 @@ export default function Page() {
     //     setStyle(response.data.answer);
     //     setCost(response.data.cost);
 
-        // setJsonContent(JSON.stringify(jsonData));
-        // const parsedText = parseJson(jsonData);
+    //     setJsonContent(JSON.stringify(jsonData));
+    //     const parsedText = parseJson(jsonData);
         const parsedText = parseJson(JSON.parse(jsonContent));        
         setFileContent(parsedText);
         setLoading(false);        
