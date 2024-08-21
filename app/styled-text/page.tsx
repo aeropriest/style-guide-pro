@@ -32,12 +32,12 @@ export default function Page() {
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
-        
+
         const formData = new FormData(e.target);
         const styleGuide = formData.get('styleGuide');
         const textToStyle = formData.get('textToStyle');
 
-    
+
         if (!styleGuide || !textToStyle) {
             setErrors({
                 styleGuide: !styleGuide,
@@ -49,28 +49,40 @@ export default function Page() {
         I want you to rewrite the following copy \n\n${textToStyle}, ensuring precision and adherence to the  provided following tone of voice guidelines.`
 
         setLoading(true);
+        const serverUrl = `https://askchatgpt-lkr2cyaq3q-uc.a.run.app`;
+
         let gptConfig = {
             method: 'post',
             maxBodyLength: Infinity,
-            url: '/api/gpt-edge',
+            url: serverUrl,
+            // url: '/api/gpt-edge',
             headers: {
                 'Content-Type': 'application/json'
             },
             data: JSON.stringify({
-                prompt,
-                styleGuide,
+                roles: [
+                    { role: 'system', content: `${prompt}\n${textToStyle}.` }
+                ]
             })
-            };
+            // data: JSON.stringify({
+            //     prompt,
+            //     styleGuide,
+            // })
+        };
 
-        let response = await axios.request(gptConfig);    
-        setStyledText(response.data.answer.replace(/\*\*/g, ''));
+        let response = await axios.request(gptConfig);
+        console.log('--------------------------------');
+        console.log(response);
+        console.log('--------------------------------');
+        // setStyledText(response.data.answer.replace(/\*\*/g, ''));
+        setStyledText(response.data.answer);
         console.log('Form submitted:', { styleGuide, textToStyle });
-        setLoading(false);        
+        setLoading(false);
     };
 
     const [formData, setFormData] = useState({
         // textToStyle:`Smithson & Associates is a prestigious law firm based in the bustling city of New York. With over 30 years of experience, our team of dedicated attorneys specializes in a wide range of legal areas, including corporate law, intellectual property, and litigation. Our firm is known for its commitment to excellence, providing personalized attention to each client and delivering innovative legal solutions. We pride ourselves on our integrity, professionalism, and successful track record, earning the trust of clients both nationally and internationally. At Smithson & Associates, we strive to uphold the highest standards of legal practice and to exceed our clients' expectations.`,
-        textToStyle:'',
+        textToStyle: '',
         styleGuide: '',
     });
 
@@ -85,9 +97,9 @@ export default function Page() {
             const reader = new FileReader();
             reader.onload = (e) => {
                 try {
-                    const fileContent = e.target?.result as string;                    
+                    const fileContent = e.target?.result as string;
                     console.log('---- parsed content ------', fileContent)
-                    setFormData({ ...formData, styleGuide: fileContent});
+                    setFormData({ ...formData, styleGuide: fileContent });
                 } catch (error) {
                     console.error('Error parsing file:', error);
                 }
@@ -98,21 +110,21 @@ export default function Page() {
     return (
         <div className="container mx-auto">
             <form onSubmit={handleSubmit} className="border border-gray-300 rounded px-16 py-2 mb-2">
-            <div className="flex justify-center">
+                <div className="flex justify-center">
                     <Label className="font-bold py-4 px-4 rounded text-xl">Style your text</Label>
                 </div>
 
-                    <Textarea rows={12} value={formData.textToStyle} placeholder="Text to style" onChange={handleChange} id="textToStyle" name="textToStyle" className={`border ${errors.textToStyle ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2 mb-4`} />
-                        {errors.textToStyle && <p className="text-red-500">Please input text to style</p>}
+                <Textarea rows={12} value={formData.textToStyle} placeholder="Text to style" onChange={handleChange} id="textToStyle" name="textToStyle" className={`border ${errors.textToStyle ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2 mb-4`} />
+                {errors.textToStyle && <p className="text-red-500">Please input text to style</p>}
 
-                    <Textarea rows={12} value={formData.styleGuide} placeholder="Load a style from 'Load style guide'" onChange={handleChange} id="styleGuide" name="styleGuide" className={`border ${errors.styleGuide ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2 mb-4`} />
-                        {errors.styleGuide && <p className="text-red-500">Plase load a style guide </p>}
-                    <Textarea rows={12} value={styledText} placeholder="Click on 'Generate Styled Text..." id="styledText" name="styledText" className={`border 'border-gray-300'} rounded w-full p-2`} onChange={(e) => setStyledText(e.target.value)} />
+                <Textarea rows={12} value={formData.styleGuide} placeholder="Load a style from 'Load style guide'" onChange={handleChange} id="styleGuide" name="styleGuide" className={`border ${errors.styleGuide ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2 mb-4`} />
+                {errors.styleGuide && <p className="text-red-500">Plase load a style guide </p>}
+                <Textarea rows={12} value={styledText} placeholder="Click on 'Generate Styled Text..." id="styledText" name="styledText" className={`border 'border-gray-300'} rounded w-full p-2`} onChange={(e) => setStyledText(e.target.value)} />
 
-                    <div className="flex justify-center space-x-2 mt-8" >
-                        <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
-                        <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Styled Text</p>}</Button>
-                        <input
+                <div className="flex justify-center space-x-2 mt-8" >
+                    <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => router.back()}>Back</Button>
+                    <Button type="submit" className="font-bold py-2 px-4 rounded">{loading ? <BeatLoader color={'#ffffff'} /> : <p>Generate Styled Text</p>}</Button>
+                    <input
                         type="file"
                         accept=".stg"
                         onChange={handleFileUpload}
