@@ -25,8 +25,9 @@ interface Errors {
 
 export default function Page() {
     const [errors, setErrors] = useState<Errors>({});
+    const [serverError, setServerError] = useState('');
     const [loading, setLoading] = useState<boolean>(false);
-    const [style, setStyle] = useState<string|undefined>();
+    const [style, setStyle] = useState<string | undefined>();
     const [cost, setCost] = useState();
     const router = useRouter()
     const text1 = `Built for the future
@@ -230,70 +231,114 @@ export default function Page() {
         ⎼	Vocabulary: Describe the word choice so others, even non copywriters, can mirror it
         ⎼	Tone: Describe the emotion in the copy so others, even non copywriters, can mirror it
         ⎼	Cadence: Describe the rhythm of the writing so others, even non copywriters, can mirror it
-        ⎼	Marketing channels: identify tonal cues that apply to different marketing chanels
+        ⎼	Marketing channels: identify tonal cues that apply to different marketing channels
     `
-        let gptConfig = {
-        method: 'post',
-        maxBodyLength: Infinity,
-        url: '/api/gpt-edge',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: JSON.stringify({
-            prompt,
-            text,
-        })
-        };
-        let response = await axios.request(gptConfig);
+        const serverUrl = `https://askchatgpt-lkr2cyaq3q-uc.a.run.app`
+        // const serverUrl = `https://askchatgpt-lkr2cyaq3q-uc.a.run.app`
+        // const serverUrl = `http://127.0.0.1:5001/query-bay/us-central1/askChatGPT`
 
-        setStyle(response.data.answer.replace(/\*\*/g, ''));
-        setCost(response.data.cost);
+        console.log('----------------')
+        console.log([
+            { role: 'system', content: `${prompt}\n${text}.` }
+        ])
+        console.log('----------------')
+        let gptConfig = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: serverUrl,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({
+                roles: [
+                    { role: 'system', content: `${prompt}\n${text}.` }
+                ]
+            })
+        };
+
+
+        // let gptConfig = {
+        //     method: 'post',
+        //     maxBodyLength: Infinity,
+        //     // url: '/api/gpt-edge',
+        //     url: serverUrl,
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     messages: JSON.stringify(
+        //         [{ "role": "system", "content": `${prompt}\n ${text}.` },]
+        //     )
+        //     // data: JSON.stringify({
+        //     //     prompt,
+        //     //     text,
+        //     // })
+        // };
+        try {
+            console.log(gptConfig);
+            let response = await axios.request(gptConfig);
+            if (response.data.error) {
+                console.log(response.data.error);
+                setServerError(`Failed to run! ${response.data.error}`);
+                throw new Error(response.data.error);
+            }
+            setStyle(response.data.answer.replace(/\*\*/g, ''));
+            setCost(response.data.cost);
+            console.log(response);
+        } catch (error: any) {
+            console.log(error);
+            if (error.status === 403) {
+                setServerError(error.error.message)
+            }
+        } finally {
+            console.log('finally')
+            setLoading(false);
+        }
         // setStyle(`Elite Law Firm Brand Voice & Tone Guidelines
 
         // Introduction:
         // Brand Voice & Tone Guidelines are essential tools that outline the unique style, voice, and tone a company uses in its communications. These guidelines inform and guide all content, fostering consistent messaging that accurately represents the company's brand identity. For Elite Law Firm, our guidelines will help us maintain a uniform tone that represents our innovative, supportive, collaborative, bold, and exceptional mission. By adhering to these guidelines, our writing will always resonate with clarity, authority, and empathy, distinctively mirroring our company's core values.
-        
+
         // Voice & Tone Guiding Principles:
-        
+
         // 1. Bold & Innovative: We are fearless, visionary, and creative in our dealings 
         // 2. Collaborative & Supportive: We value inclusion, empathy, and team spirit 
         // 3. Strategic & Exceptional: We are driven, focusing on exceeding standards and expectations 
-        
+
         // 1. Bold & Innovative
         //     - What it means: Our copy suggests daring, challenging norms, and embracing fresh ideas. 
         //     - How it affects our writing: We use confident, energetic, and optimistic language.
         //     - Best Practice Copy: "Together, we can redefine the legal landscape. Comfort zones? We don't know them! New challenges are our terrain."
         //     - What not to do: Avoid passive language. Don't be afraid to voice our innovative ideas. 
         //     - Incorrect Example: "We might possibly venture into unknown territories. If all goes well, we hope our ideas could work." 
-        
+
         // 2. Collaborative & Supportive
         //    - What it means: Valuing trust, mutual respect, diversity, and open dialogue.
         //    - How it affects our writing: The language used is inclusive, understanding, caring, and respects diversity. 
         //    - Best Practice Copy: "Every voice matters here. United, we are a powerhouse of brightness, brilliance, and boundless innovation."
         //    - What not to do: Avoid words that marginalize or exclude. Never belittle or disrespect others in writing. 
         //    - Incorrect Example: "The most important voices are those at the top. We'll tell you everything you need to know."
-        
+
         // 3. Strategic & Exceptional
         //     - What it means: Committed to delivering unprecedented outcomes through smart decisions.
         //     - How it affects our writing: Use focused, goal-oriented, and ambitious language. 
         //     - Best Practice Copy: "With meticulous strategies, we aim for novel breakthroughs - no goal is too grand for our reach."
         //     - What not to do: Avoid vague or unclear statements. Don't undermine our capabilities or devalue our goals.
         //     - Incorrect Example: "We'll try our best to meet expectations, but legal strategies can sometimes be confusing."
-        
+
         // Vocabulary: Use precise and sophisticated language characterized by legal jargon, active verbs, inclusive words, positive affirmations, and inspirational undertones.
-        
+
         // Tone: Adopt an energetic and authoritative tone that encourages innovation and collaboration. Maintain optimism and confidence, articulate core values with enthusiasm, and use powerful, striking language.
-        
+
         // Cadence: The rhythm of our writing is energetic and decisive. It maintains a steady tempo, punctuates confidence, and intersperses thought-provoking pauses to highlight our commitment to innovation and collaboration.
-        
+
         // Marketing channels: 
         // 1. Website & Social Media: Use friendly, engaging language, share thought leadership, and innovation stories. 
         // 2. Email Promotions: Professional and detailed, highlighting our offerings, expertise, and key wins.
         // 3. Print Brochures: Comprehensive and authoritative, deep-diving into our services and accomplishments. 
         // 4. Press Releases & Legal Reports: Formal and informative, conveying key messages and findings with absolute clarity.
-        
+
         // Let these guidelines serve as a compass, pointing the way to a consistently compelling communication that resonates with our core values and mission.`)
-        setLoading(false);        
+
     };
 
     const handleSaveStyleGuide = () => {
@@ -309,9 +354,9 @@ export default function Page() {
             URL.revokeObjectURL(url);
         }
     };
-    if (style) {                       
+    if (style) {
         return (
-            <div className="container mx-auto p-16">                
+            <div className="container mx-auto p-16">
                 <div className="flex justify-center">
                     <Label className="font-bold py-2 px-4 rounded text-lg">Recommended Style Guide <p className='text-sm font-small'>{cost}</p></Label>
                 </div>
@@ -322,8 +367,8 @@ export default function Page() {
                 <div className="flex justify-center space-x-2 mt-4">
                     <Button type="button" className="font-bold py-2 px-4 rounded" onClick={() => setStyle('')}>Back</Button>
                     <Button type="submit" className="font-bold py-2 px-4 rounded" onClick={handleSaveStyleGuide}>Save</Button>
-                    <Button onClick={()=>router.push("/styled-text")}>Generate Styled Text</Button>
-                </div>                
+                    <Button onClick={() => router.push("/styled-text")}>Generate Styled Text</Button>
+                </div>
             </div>
         )
     }
@@ -334,6 +379,7 @@ export default function Page() {
                 <div className="flex justify-center">
                     <Label className="font-bold py-2 px-4 rounded text-lg">Generate Style Guide</Label>
                 </div>
+                {serverError && <div className="flex justify-center"><Label className="font-bold py-2 px-4 rounded text-lg text-red-400">{serverError}</Label></div>}
                 <div className="mb-4">
                     <Label htmlFor="companyName" className="block">Company Name</Label>
                     <Input id="companyName" name="companyName" value={formData.companyName} onChange={handleChange} className={`border ${errors.companyName ? 'border-red-500' : 'border-gray-300'} rounded w-full p-2`} />
